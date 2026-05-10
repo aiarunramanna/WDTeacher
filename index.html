@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- WDTeacher | Version 2.0 | 2026-05-09 | Workday T&A Complete Course -->
+<!-- WDTeacher | Version 2.1 | 2026-05-10 14:30 | Workday T&A Complete Course | Sidebar search added -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -27,9 +27,20 @@ html,body{height:100%;background:var(--paper);color:var(--ink);font-family:'DM S
 .prog-lbl{font-size:11px;color:#777;white-space:nowrap;}
 
 /* SIDEBAR */
-.sidebar{background:var(--white);border-right:1px solid var(--border);overflow-y:auto;padding-bottom:2rem;}
+.sidebar{background:var(--white);border-right:1px solid var(--border);overflow-y:auto;padding-bottom:2rem;display:flex;flex-direction:column;}
 .sidebar::-webkit-scrollbar{width:4px;}
 .sidebar::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+.sb-search{position:sticky;top:0;background:var(--white);padding:.65rem .8rem;border-bottom:1px solid var(--border);z-index:5;}
+.sb-search-wrap{position:relative;}
+.sb-search-input{width:100%;padding:.45rem .65rem .45rem 1.85rem;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--ink);background:var(--cream);border:1px solid var(--border);border-radius:6px;outline:none;transition:border-color .15s,background .15s;}
+.sb-search-input:focus{border-color:var(--accent);background:var(--white);}
+.sb-search-input::placeholder{color:var(--muted);}
+.sb-search-icon{position:absolute;left:.55rem;top:50%;transform:translateY(-50%);font-size:11px;color:var(--muted);pointer-events:none;}
+.sb-search-clear{position:absolute;right:.4rem;top:50%;transform:translateY(-50%);background:transparent;border:none;color:var(--muted);font-size:14px;cursor:pointer;padding:0 .25rem;line-height:1;display:none;}
+.sb-search-clear.show{display:block;}
+.sb-search-clear:hover{color:var(--accent);}
+.sb-empty{padding:1rem;font-size:11.5px;color:var(--muted);text-align:center;font-style:italic;}
+.les-ttl mark{background:var(--gold);color:var(--ink);padding:0 2px;border-radius:2px;}
 .mod-group{border-bottom:1px solid var(--border);}
 .mod-hdr{display:flex;align-items:center;gap:.6rem;padding:.7rem 1rem;cursor:pointer;user-select:none;transition:background .15s;}
 .mod-hdr:hover{background:var(--cream);}
@@ -146,7 +157,16 @@ html,body{height:100%;background:var(--paper);color:var(--ink);font-family:'DM S
   </div>
 </header>
 
-<nav class="sidebar" id="sb"></nav>
+<nav class="sidebar">
+  <div class="sb-search">
+    <div class="sb-search-wrap">
+      <span class="sb-search-icon">&#9906;</span>
+      <input type="text" id="sbSearch" class="sb-search-input" placeholder="Search lessons..." autocomplete="off" spellcheck="false">
+      <button type="button" id="sbSearchClear" class="sb-search-clear" aria-label="Clear search">&times;</button>
+    </div>
+  </div>
+  <div id="sb"></div>
+</nav>
 <main class="main" id="main"></main>
 
 </div>
@@ -527,7 +547,21 @@ roles:[{r:"pm",t:"Conduct lessons learned session with all workstream leads -- w
 // ============================================================
 // STATE
 // ============================================================
-var S={view:"welcome",mi:0,li:0,done:{}};
+var S={view:"welcome",mi:0,li:0,done:{},search:""};
+
+function escRe(s){return s.replace(/[.*+?^${}()|[\]\\]/g,"\\$&");}
+function escHtml(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+function highlight(txt,q){
+  if(!q) return escHtml(txt);
+  var re=new RegExp("("+escRe(q)+")","ig");
+  return escHtml(txt).replace(re,"<mark>$1</mark>");
+}
+function lessonMatches(les,q){
+  if(!q) return true;
+  var hay=(les.title||"")+" "+(les.body||"");
+  if(les.points) hay+=" "+les.points.join(" ");
+  return hay.toLowerCase().indexOf(q.toLowerCase())!==-1;
+}
 
 function totL(){return M.reduce(function(a,m){return a+m.lessons.length;},0);}
 function doneL(){return Object.keys(S.done).length;}
@@ -539,10 +573,19 @@ function gNum(mi,li){var n=0;for(var i=0;i<mi;i++)n+=M[i].lessons.length;return 
 function buildSB(){
   var sb=document.getElementById("sb");
   sb.innerHTML="";
+  var q=(S.search||"").trim();
+  var hits=0;
+
   M.forEach(function(mod,mi){
+    var matchingLi=[];
+    mod.lessons.forEach(function(les,li){
+      if(lessonMatches(les,q)) matchingLi.push(li);
+    });
+    if(q&&matchingLi.length===0) return; // hide modules with zero matches when searching
+
     var dc=mod.lessons.filter(function(_,li){return S.done[mi+"-"+li];}).length;
-    var isOpen=S.view==="lesson"&&S.mi===mi;
-    var isAct=isOpen;
+    var isOpen=(q?true:(S.view==="lesson"&&S.mi===mi));
+    var isAct=S.view==="lesson"&&S.mi===mi;
 
     var g=document.createElement("div");g.className="mod-group";
 
@@ -557,6 +600,8 @@ function buildSB(){
     l.className="lessons"+(isOpen?" open":"");
 
     mod.lessons.forEach(function(les,li){
+      if(q&&matchingLi.indexOf(li)===-1) return; // hide non-matching lessons when searching
+      hits++;
       var key=mi+"-"+li;
       var isCur=S.view==="lesson"&&S.mi===mi&&S.li===li;
       var isDone=S.done[key];
@@ -564,7 +609,7 @@ function buildSB(){
       it.className="les-item"+(isCur?" active":"");
       it.innerHTML='<div class="les-chk'+(isDone?" done":"")+'">'+( isDone?"&#10003;":"")+'</div>'+
         '<div class="les-num">'+gNum(mi,li)+'</div>'+
-        '<div class="les-ttl">'+les.title+'</div>';
+        '<div class="les-ttl">'+highlight(les.title,q)+'</div>';
       (function(a,b){it.onclick=function(){go(a,b);};})(mi,li);
       l.appendChild(it);
     });
@@ -572,6 +617,13 @@ function buildSB(){
     h.onclick=function(){l.classList.toggle("open");h.classList.toggle("open");};
     g.appendChild(h);g.appendChild(l);sb.appendChild(g);
   });
+
+  if(q&&hits===0){
+    var empty=document.createElement("div");
+    empty.className="sb-empty";
+    empty.textContent='No lessons match "'+q+'"';
+    sb.appendChild(empty);
+  }
 }
 
 // ============================================================
@@ -672,7 +724,7 @@ function renderLesson(les,mi,li){
 // ============================================================
 function renderWelcome(){
   var h='<div class="welcome">'+
-    '<div class="ver">v2.0 &nbsp;&middot;&nbsp; 2026-05-09</div>'+
+    '<div class="ver">v2.1 &nbsp;&middot;&nbsp; 2026-05-10 14:30</div>'+
     '<h1>Workday<br><span>T&amp;A</span> Course</h1>'+
     '<p class="w-sub">Complete guide to Workday Time &amp; Attendance, dormakaba terminal integration, B-COMM middleware, and full project management implementation. '+totL()+' lessons across '+M.length+' modules.</p>'+
     '<div class="mod-grid">';
@@ -706,6 +758,35 @@ function render(){
 }
 
 render();
+
+// ============================================================
+// SIDEBAR SEARCH
+// ============================================================
+(function(){
+  var input=document.getElementById("sbSearch");
+  var clear=document.getElementById("sbSearchClear");
+  if(!input) return;
+  input.addEventListener("input",function(){
+    S.search=input.value;
+    clear.classList.toggle("show",input.value.length>0);
+    buildSB();
+  });
+  clear.addEventListener("click",function(){
+    input.value="";
+    S.search="";
+    clear.classList.remove("show");
+    buildSB();
+    input.focus();
+  });
+  input.addEventListener("keydown",function(e){
+    if(e.key==="Escape"){
+      input.value="";
+      S.search="";
+      clear.classList.remove("show");
+      buildSB();
+    }
+  });
+})();
 </script>
 </body>
 </html>
