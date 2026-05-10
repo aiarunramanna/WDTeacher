@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<!-- WDTeacher | Version 2.0 | 2026-05-09 | Workday T&A Complete Course -->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WDTeacher - Workday T&A Course</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@300;400;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --ink:#1a1a2e;--paper:#f8f5f0;--cream:#ede9e1;
+  --accent:#c84b31;--gold:#d4a853;--sage:#4a7c59;
+  --muted:#7a7065;--border:#d8d0c5;--white:#fff;
+}
+html,body{height:100%;background:var(--paper);color:var(--ink);font-family:'DM Sans',sans-serif;}
+.shell{display:grid;grid-template-columns:290px 1fr;grid-template-rows:58px 1fr;height:100vh;overflow:hidden;}
+
+/* TOPBAR */
+.topbar{grid-column:1/-1;background:var(--ink);display:flex;align-items:center;padding:0 1.5rem;gap:1rem;border-bottom:3px solid var(--accent);}
+.logo{font-family:'Fraunces',serif;font-size:21px;font-weight:700;color:#fff;letter-spacing:-.5px;}
+.logo span{color:var(--gold);}
+.topbar-sub{font-size:12px;color:#777;border-left:1px solid #444;padding-left:1rem;}
+.prog-wrap{margin-left:auto;display:flex;align-items:center;gap:.75rem;}
+.prog-track{width:160px;height:5px;background:#333;border-radius:3px;overflow:hidden;}
+.prog-fill{height:100%;background:var(--gold);border-radius:3px;transition:width .4s ease;width:0%;}
+.prog-lbl{font-size:11px;color:#777;white-space:nowrap;}
+
+/* SIDEBAR */
+.sidebar{background:var(--white);border-right:1px solid var(--border);overflow-y:auto;padding-bottom:2rem;}
+.sidebar::-webkit-scrollbar{width:4px;}
+.sidebar::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+.mod-group{border-bottom:1px solid var(--border);}
+.mod-hdr{display:flex;align-items:center;gap:.6rem;padding:.7rem 1rem;cursor:pointer;user-select:none;transition:background .15s;}
+.mod-hdr:hover{background:var(--cream);}
+.mod-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+.mod-ttl{font-size:11.5px;font-weight:500;color:var(--ink);flex:1;line-height:1.3;}
+.mod-cnt{font-size:10px;color:var(--muted);}
+.mod-arr{font-size:10px;color:var(--muted);transition:transform .2s;}
+.mod-hdr.open .mod-arr{transform:rotate(90deg);}
+.lessons{display:none;padding-bottom:.2rem;}
+.lessons.open{display:block;}
+.les-item{display:flex;align-items:flex-start;gap:.55rem;padding:.4rem 1rem .4rem 1.7rem;cursor:pointer;transition:background .15s;border-left:3px solid transparent;}
+.les-item:hover{background:var(--cream);}
+.les-item.active{background:var(--cream);border-left-color:var(--accent);}
+.les-chk{width:15px;height:15px;border-radius:50%;border:1.5px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:8px;color:var(--white);margin-top:2px;transition:all .2s;}
+.les-chk.done{background:var(--sage);border-color:var(--sage);}
+.les-num{font-size:10px;color:var(--muted);flex-shrink:0;min-width:18px;margin-top:2px;}
+.les-ttl{font-size:11.5px;color:var(--ink);line-height:1.35;}
+.les-item.active .les-ttl{font-weight:500;color:var(--accent);}
+
+/* MAIN */
+.main{overflow-y:auto;background:var(--paper);padding:2.5rem 3rem;}
+.main::-webkit-scrollbar{width:5px;}
+.main::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+
+/* LESSON */
+.lesson{max-width:720px;margin:0 auto;animation:fi .3s ease;}
+@keyframes fi{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+.eyebrow{display:flex;align-items:center;gap:.6rem;margin-bottom:.7rem;}
+.mod-badge{font-size:10px;font-weight:500;padding:2px 10px;border-radius:99px;color:#fff;letter-spacing:.04em;text-transform:uppercase;}
+.les-num-badge{font-size:11px;color:var(--muted);}
+.les-heading{font-family:'Fraunces',serif;font-size:34px;font-weight:600;color:var(--ink);line-height:1.15;margin-bottom:1.4rem;letter-spacing:-.5px;}
+.divider{height:3px;width:44px;border-radius:2px;margin-bottom:1.6rem;}
+.body-text{font-size:15px;line-height:1.8;color:#333;}
+.body-text p{margin-bottom:1.1rem;}
+.body-text strong{color:var(--ink);font-weight:600;}
+
+/* WBS meta badge */
+.wbs-meta{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:1.25rem;}
+.wbs-chip{font-size:11px;padding:3px 10px;border-radius:5px;border:1px solid var(--border);color:var(--muted);}
+.wbs-chip.phase{background:var(--cream);}
+
+/* Key points */
+.key-pts{background:var(--white);border:1px solid var(--border);border-left:4px solid var(--accent);border-radius:0 8px 8px 0;padding:1.2rem 1.5rem;margin:1.4rem 0;}
+.key-pts-ttl{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);margin-bottom:.7rem;}
+.key-pt{display:flex;gap:.7rem;align-items:flex-start;margin-bottom:.55rem;font-size:14.5px;line-height:1.6;color:#333;}
+.key-pt:last-child{margin-bottom:0;}
+.kp-dot{width:5px;height:5px;border-radius:50%;background:var(--accent);flex-shrink:0;margin-top:8px;}
+
+/* Info box */
+.info-box{background:#eef4fb;border:1px solid #b8d4ed;border-radius:8px;padding:1rem 1.3rem;margin:1.2rem 0;font-size:14px;color:#2c4a6e;line-height:1.65;}
+.info-ttl{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:#2e6da4;margin-bottom:.4rem;}
+
+/* Table */
+.dtable{width:100%;border-collapse:collapse;margin:1.2rem 0;font-size:14px;}
+.dtable th{background:var(--ink);color:#fff;padding:7px 13px;text-align:left;font-size:10px;letter-spacing:.05em;font-weight:500;}
+.dtable td{padding:8px 13px;border-bottom:1px solid var(--border);color:#333;vertical-align:top;line-height:1.5;}
+.dtable tr:last-child td{border-bottom:none;}
+.dtable tr:nth-child(even) td{background:var(--cream);}
+
+/* Steps */
+.steps{margin:1.2rem 0;}
+.step{display:flex;gap:.9rem;align-items:flex-start;margin-bottom:.8rem;}
+.step-n{width:26px;height:26px;border-radius:50%;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0;}
+.step-body{padding-top:3px;font-size:14.5px;color:#333;line-height:1.6;}
+.step-title{font-weight:600;color:var(--ink);margin-bottom:2px;font-size:14px;}
+
+/* Role action cards */
+.role-actions{margin:1.2rem 0;display:flex;flex-direction:column;gap:.5rem;}
+.ra{display:flex;gap:.75rem;align-items:flex-start;padding:.65rem .9rem;border-radius:7px;border:1px solid var(--border);background:var(--white);}
+.ra-role{font-size:10px;font-weight:600;padding:2px 8px;border-radius:4px;flex-shrink:0;text-transform:uppercase;letter-spacing:.04em;margin-top:1px;}
+.ra-wd{background:#dbeafe;color:#1e40af;}
+.ra-it{background:#ede9fe;color:#5b21b6;}
+.ra-tc{background:#dcfce7;color:#166534;}
+.ra-pm{background:#fef3c7;color:#92400e;}
+.ra-text{font-size:14px;color:#333;line-height:1.55;}
+
+/* Nav */
+.nav-footer{display:flex;align-items:center;justify-content:space-between;margin-top:2.75rem;padding-top:1.4rem;border-top:1px solid var(--border);}
+.nav-btn{display:flex;align-items:center;gap:.45rem;padding:.55rem 1.15rem;border-radius:7px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all .2s;border:1.5px solid var(--border);background:var(--white);color:var(--ink);}
+.nav-btn:hover{border-color:var(--ink);}
+.nav-btn:disabled{opacity:.35;cursor:not-allowed;}
+.nav-btn.primary{background:var(--ink);color:#fff;border-color:var(--ink);}
+.nav-btn.primary:hover{background:#2d2d4e;}
+.done-btn{display:flex;align-items:center;gap:.4rem;padding:.5rem 1rem;border-radius:7px;font-size:12px;font-weight:500;cursor:pointer;border:1.5px solid var(--sage);background:transparent;color:var(--sage);transition:all .2s;font-family:'DM Sans',sans-serif;}
+.done-btn:hover{background:var(--sage);color:#fff;}
+.done-btn.done{background:var(--sage);color:#fff;}
+
+/* WELCOME */
+.welcome{max-width:680px;margin:0 auto;animation:fi .4s ease;}
+.welcome h1{font-family:'Fraunces',serif;font-size:46px;font-weight:700;color:var(--ink);line-height:1.1;margin-bottom:.5rem;letter-spacing:-1px;}
+.welcome h1 span{color:var(--accent);}
+.w-sub{font-size:15px;color:var(--muted);margin-bottom:2.25rem;line-height:1.6;}
+.mod-grid{display:grid;grid-template-columns:1fr 1fr;gap:.8rem;margin-bottom:1.75rem;}
+.mc{background:var(--white);border:1px solid var(--border);border-radius:9px;padding:.9rem 1.1rem;cursor:pointer;transition:all .2s;}
+.mc:hover{border-color:var(--ink);transform:translateY(-1px);box-shadow:0 4px 14px rgba(0,0,0,.07);}
+.mc-top{display:flex;align-items:center;gap:.55rem;margin-bottom:.3rem;}
+.mc-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+.mc-ttl{font-size:13.5px;font-weight:600;color:var(--ink);}
+.mc-cnt{font-size:11px;color:var(--muted);}
+.start-btn{display:inline-flex;align-items:center;gap:.5rem;padding:.8rem 1.9rem;background:var(--ink);color:#fff;border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:500;cursor:pointer;transition:all .2s;}
+.start-btn:hover{background:var(--accent);}
+.ver{display:inline-block;font-size:10px;padding:2px 8px;border-radius:4px;background:var(--cream);color:var(--muted);border:1px solid var(--border);margin-bottom:.9rem;}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<header class="topbar">
+  <div class="logo">WD<span>Teacher</span></div>
+  <div class="topbar-sub">Workday Time &amp; Attendance - Complete Course</div>
+  <div class="prog-wrap">
+    <div class="prog-track"><div class="prog-fill" id="pf"></div></div>
+    <div class="prog-lbl" id="pl">0 / 0 lessons</div>
+  </div>
+</header>
+
+<nav class="sidebar" id="sb"></nav>
+<main class="main" id="main"></main>
+
+</div>
+<script>
+var ROLES={wd:"Workday Analyst",it:"IT Dept",tc:"Clock Installer",pm:"Project Manager"};
+var ROLE_CSS={wd:"ra-wd",it:"ra-it",tc:"ra-tc",pm:"ra-pm"};
+
+var M=[
+{id:0,title:"Foundations",color:"#c84b31",lessons:[
+{title:"What is Workday T&A?",
+body:"<p>Workday Time and Attendance is a cloud-based enterprise platform that tracks employee work hours, manages absences, and feeds accurate data into payroll. It sits inside the broader Workday HCM suite.</p><p>Unlike legacy on-premise systems, Workday T&A requires no local servers and updates automatically for every customer twice a year.</p>",
+points:["Cloud-based SaaS -- no on-premise version exists","Part of the Workday HCM ecosystem alongside Payroll and Absence Management","Automatic biannual updates every March and September","Connects directly with Workday Payroll and Absence Management","No IT upgrade projects -- all updates happen automatically"]},
+
+{title:"Exempt vs Non-Exempt Employees",
+body:"<p>The classification of employees as exempt or non-exempt drives how hours are tracked and whether overtime rules apply. This is one of the most fundamental concepts in time tracking.</p>",
+table:{h:["Category","Overtime Eligible","How Time is Tracked"],r:[["Exempt (E)","No","Often not required, or optional"],["Non-Exempt (NE)","Yes -- must track all hours","All hours must be recorded by law"],["Hourly (H)","Yes","Paid exactly by hours logged in timesheet"]]},
+points:["Exempt employees are typically salaried professionals","Non-exempt workers must have all hours recorded by law","Hourly workers are paid directly based on timesheet entries","Misclassification creates legal and payroll compliance risk"]},
+
+{title:"The T&A Ecosystem",
+body:"<p>Workday T&A is deeply integrated with three other Workday modules. Understanding these connections is essential for any implementation.</p>",
+table:{h:["Module","Relationship to T&A"],r:[["Workday HCM","Source of worker profiles, orgs, and pay groups"],["Workday Payroll","Receives approved time data for pay calculation"],["Absence Management","Tracks PTO, accruals, and leave alongside timesheets"],["Workday Projects","Optional -- allows time entry against project codes"]]},
+points:["New hires and terminations in HCM flow into T&A automatically","Approved timecards feed Payroll without manual re-entry","Absence balances are visible on the same timesheet","No duplicate data entry across systems"]},
+
+{title:"Cloud SaaS -- No Installs Needed",
+body:"<p>Workday was built cloud-native from day one. This means no servers, no software to install, no upgrade projects. Every customer runs the same version and gets updates automatically.</p>",
+points:["No servers to maintain -- Workday hosts everything","All customers on the same platform version at all times","Browser or mobile app access from anywhere in the world","Biannual releases in March and September for all customers","IT department is not needed for upgrades or patches"]}
+]},
+
+{id:1,title:"Time Entry",color:"#4a7c59",lessons:[
+{title:"How to Enter Your Time",
+body:"<p>Employees log hours in Workday using the Time worklet. The process is the same on browser and mobile and takes under two minutes.</p>",
+steps:[{n:1,title:"Open the Time worklet",body:"Log in to Workday and click the Time worklet on your home screen."},{n:2,title:"Select the pay period",body:"Choose the current week or pay period. The calendar view shows your schedule."},{n:3,title:"Add time blocks",body:"Click on a day and enter your hours with a time type: Regular, Overtime, or a project code."},{n:4,title:"Review total hours",body:"The weekly total appears at the top. Confirm it matches your actual hours worked."},{n:5,title:"Submit before the deadline",body:"Click Submit. Your manager receives a notification to review and approve."}],
+points:["Time can be entered daily or all at once for the week","Entries auto-save as drafts until submitted","You can only submit once -- review carefully before clicking Submit"]},
+
+{title:"Web vs Mobile Time Clock",
+body:"<p>Workday supports both browser and mobile time entry. Both generate automatic timestamps and sync to the same timesheet in real time.</p>",
+table:{h:["Feature","Web Browser","Mobile App"],r:[["Access","Any browser","iOS or Android"],["Clock In/Out","Yes","Yes -- with GPS timestamp"],["Geofencing","No","Yes -- location-based reminders"],["Offline support","No","Limited caching"],["Best for","Office workers","Field and remote workers"]]},
+points:["Mobile app available on iOS and Android free of charge","Both interfaces sync in real time to the same Workday timesheet","Managers can approve timecards from the mobile app too"]},
+
+{title:"Geofencing for Field Workers",
+body:"<p>The Workday mobile app includes geofencing -- a location-based feature that detects when an employee arrives at a job site and sends a push notification to clock in.</p><p>This is especially valuable for construction, healthcare, retail, and logistics where workers move between sites.</p>",
+points:["A virtual boundary is set around each job site location","When the employee's phone enters the boundary, a push notification fires","The notification prompts: 'You've arrived at Site A -- clock in?'","Employee taps to confirm -- punch is recorded automatically","Prevents forgotten clock-ins at remote sites","Requires location permission granted on the employee's device"]},
+
+{title:"Timesheet Deadlines and Lockouts",
+body:"<p>Every pay period has a Time Period Lockout date. After this date, employees can no longer submit or edit their own timesheets. This protects payroll processing.</p>",
+info:{t:"Important",b:"The lockout date is visible on your timesheet at the top of the screen. Check it every week. Your manager may set an earlier internal deadline before the system lockout."},
+points:["Lockout dates are configured by HR Admins per pay group","After lockout: only managers and payroll admins can make corrections","Missing the deadline requires a manager correction request","Best practice: submit by end of business on the last day of your work week"]},
+
+{title:"How to Correct Time Mistakes",
+body:"<p>Workday provides a clear correction process depending on what stage the timesheet is at.</p>",
+table:{h:["Stage","Who Can Correct","How"],r:[["Draft (not submitted)","Employee","Edit directly -- click the time block and change it"],["Submitted, not approved","Employee","Retract submission, edit, then resubmit"],["Submitted and approved","Manager","Manager uses Enter Time on behalf of the worker"],["After payroll has run","Payroll Admin","Retroactive correction -- creates a payroll adjustment"]]}}
+]},
+
+{id:2,title:"Absence Management",color:"#2e6da4",lessons:[
+{title:"Time Off vs Leave of Absence",
+body:"<p>Workday handles two distinct types of absences, each with different approval workflows, rules, and compliance implications.</p>",
+table:{h:["Type","Duration","Approved By","Examples"],r:[["Time Off Request","Short-term (days)","Direct Manager","Vacation, sick day, jury duty, bereavement"],["Leave of Absence","Long-term (weeks/months)","Central HR","FMLA, parental leave, military, disability"]]},
+info:{t:"30-Day Rule",b:"Any employee absent for more than 30 consecutive days must be placed on a formal Leave of Absence -- not just a time off request. This triggers HR workflows and legal compliance checks."}},
+
+{title:"How to Request Time Off",
+body:"<p>Employees request time off through the Workday absence calendar, mobile app, or the Workday Self-Service Agent chatbot.</p>",
+steps:[{n:1,title:"Open the Absence worklet",body:"Click the Absence worklet on your home screen."},{n:2,title:"Click Request",body:"Choose the absence type: Vacation, Sick, Personal, etc."},{n:3,title:"Select dates",body:"Click the days on the calendar. Half days are supported."},{n:4,title:"Add a comment",body:"Optional -- add a note for your manager if helpful."},{n:5,title:"Submit",body:"Your manager receives an email notification and can approve or deny from phone or browser."}],
+points:["Approved time off automatically appears on your timesheet","Your balance updates in real time after approval","You can view teammates' approved time off on a shared team calendar"]},
+
+{title:"Checking Your PTO Balance",
+body:"<p>Workday shows your current balance, projected future balances, and usage history all in one place.</p>",
+points:["Go to the Absence worklet and click View to see current balances","Enter any future date to project your balance on that day","Balance history shows every accrual, usage, and adjustment","Balances update overnight after each pay period processes","Your manager can also view your projected balance when planning approvals","Carryover rules are applied automatically at year-end based on your plan"]},
+
+{title:"Types of Leave Workday Supports",
+body:"<p>Workday Absence Management supports a wide range of leave types, each with its own eligibility rules and approval workflow.</p>",
+table:{h:["Leave Type","Description"],r:[["Vacation / PTO","Standard paid time off, accrual-based"],["Sick Leave","Paid or unpaid sick time, often legally mandated"],["Parental Leave","Birth, adoption, and bonding leave"],["FMLA","US Family and Medical Leave Act -- up to 12 weeks unpaid"],["Military Leave","Active duty, reserves, and training"],["Bereavement","Death of a family member"],["Jury Duty","Court-mandated absence"],["Disability","Short and long-term disability plan integration"]]}},
+
+{title:"Accrual Policies and Carryover Rules",
+body:"<p>Accrual policies define how employees earn time off. Carryover rules define what happens to unused balances at year-end. Both are configured in Workday by HR Admins.</p>",
+points:["Accrual rate: how much time is earned per pay period (e.g. 1.5 days per month)","Accrual cap: maximum balance that can accumulate (e.g. 240 hours max)","Carryover limit: maximum hours that roll into the new year","Forfeit rules: hours above the carryover limit are lost at year-end","Waiting period: new hires may not accrue for the first 90 days","All rules are configurable per country, pay group, or employee type"]}
+]},
+
+{id:3,title:"Manager Tools",color:"#8b4513",lessons:[
+{title:"Your Role as a Manager",
+body:"<p>As a manager in Workday T&A, you are the primary checkpoint between employee time entry and payroll. Your approvals are what make hours eligible to be paid.</p>",
+points:["You receive notifications when team members submit timecards","You can approve, deny, or correct timecards","You can enter time on behalf of an employee if needed","You cannot approve a timecard that has not been submitted first","For employees with multiple jobs, approvals may route to different managers","Your dashboard shows exception alerts for unusual time entries"]},
+
+{title:"Approving Timecards",
+body:"<p>Timecard approval can be done in bulk from the manager dashboard or one at a time. Both browser and mobile are fully supported.</p>",
+steps:[{n:1,title:"Open Team Time",body:"Click the Team Time worklet or navigate to your manager dashboard."},{n:2,title:"Review pending timecards",body:"See all team members with submitted, unreviewed timecards for the current period."},{n:3,title:"Check for exceptions",body:"Red flags indicate missed punches, overtime, or entries outside scheduled hours."},{n:4,title:"Approve individually or in bulk",body:"Click approve on a single timecard, or use Shift+click to select multiple and bulk approve."},{n:5,title:"Confirm approval",body:"Approved timecards are locked and sent for payroll processing."}],
+info:{t:"Mobile Approval",b:"All timecard approval actions are fully available on the Workday mobile app. You can review and approve your team's time from your phone."}},
+
+{title:"Exception Management",
+body:"<p>Exception management is Workday's automatic flagging system. It scans all time entries and highlights anything unusual before it reaches payroll.</p>",
+table:{h:["Exception Type","What It Means"],r:[["Missed In Punch","Clock-in with no corresponding clock-out"],["Early In","Employee clocked in before their scheduled start"],["Late Out","Employee clocked out after their scheduled end"],["Short Break","Break was shorter than the required minimum"],["Missing Break","No break recorded during a long shift"],["Unscheduled Day","Time recorded on a day the employee is not scheduled"],["Overtime Alert","Hours approaching or exceeding the overtime threshold"]]},
+points:["Exceptions appear as colored flags on the timecard","Managers investigate and either correct the entry or approve the exception","Unresolved exceptions can block payroll processing"]},
+
+{title:"How Overtime Auto-Calculates",
+body:"<p>Workday automatically calculates overtime based on configured rules. Employees enter all hours as Regular and Workday reclassifies them.</p>",
+points:["Employees enter all hours as Regular on their timesheet","Workday compares total hours against the overtime threshold (e.g. 40 hours/week)","Hours above the threshold are automatically reclassified as Overtime","Daily overtime rules can also apply (e.g. over 8 hours in a single day)","Double-time rules apply when configured for certain shifts or days","Managers see unpaid overtime flagged until they explicitly approve it"]},
+
+{title:"Forecasting Team Time-Off",
+body:"<p>Managers can view projected time-off balances for any team member as of any future date. This is essential for staffing and capacity planning.</p>",
+steps:[{n:1,title:"Open team member absence record",body:"Go to the worker's profile and click Absence."},{n:2,title:"View current balance",body:"See the live balance for each absence type."},{n:3,title:"Enter a future date",body:"Type a date 3, 6, or 12 months from now to see the projected balance."},{n:4,title:"Plan accordingly",body:"Use this to decide whether to approve or defer a time off request during a busy period."}]},
+
+{title:"The Manager Dashboard",
+body:"<p>The manager dashboard is a single-screen command center for all time and attendance tasks -- available on both desktop and mobile.</p>",
+points:["Pending timecard approvals -- one click to review the queue","Exception alerts -- all unusual entries across the full team","Team absence calendar -- see who is off and when","Labor cost summary -- real-time hours and costs by team","Overtime risk -- employees approaching 40 hours mid-week","Quick access to enter time on behalf of a worker","All actions available on the Workday mobile app"]}
+]},
+
+{id:4,title:"Compliance and Reports",color:"#5b4b8a",lessons:[
+{title:"Reducing Compliance Risk",
+body:"<p>One of the most important reasons organizations implement Workday T&A is to reduce legal and payroll compliance risk. Manual timesheets and spreadsheets are error-prone and difficult to audit.</p>",
+points:["Overtime rules configured once and enforced automatically on every timesheet","Meal and break penalties trigger automatically when breaks are missed","All time entries are auditable -- every change has a timestamp and user ID","Business rules prevent early clock-in, unauthorized overtime, and invalid transfers","Compliance reports can be generated in seconds for any audit","Minimum wage and shift premium calculations are automated per location and role"]},
+
+{title:"Physical Time Clock Integration",
+body:"<p>For hourly workers who cannot use a phone or computer, Workday integrates with physical time clocks through the Time Clock Events API. Employees tap a badge or use biometrics, and the punch flows directly into their Workday timesheet.</p>",
+points:["Time Clock Events API receives punch data from physical terminals","Badge number maps to Workday Worker ID to identify the employee","Clock-in, clock-out, break, meal, and transfer events are all supported","Middleware software like dormakaba B-COMM handles the translation","Punches appear on the timesheet within 1-5 minutes of the clock event","Offline recovery: clocks store punches locally if network is down and sync later"]},
+
+{title:"Overtime Reports and Analytics",
+body:"<p>Workday provides real-time overtime reporting that helps managers and HR identify cost risks before payroll runs.</p>",
+table:{h:["Report","What It Shows"],r:[["Weekly OT Risk","Employees approaching 40 hours mid-week -- act before OT is incurred"],["OT by Department","Which teams consistently generate overtime -- for staffing decisions"],["YTD OT Cost","Total year-to-date overtime cost per department or location"],["OT Approval Rate","Percentage of overtime approved vs flagged as unauthorized"],["Meal Penalty Report","Employees who missed required breaks -- compliance exposure"]]},
+points:["All reports run in real time -- no waiting for batch processing","Reports can be scheduled to email managers every Monday morning","Custom reports can be built using Workday's built-in report writer"]},
+
+{title:"Global Absence Analytics",
+body:"<p>The Global Absence Analytics dashboard gives HR leaders a company-wide view of absence patterns, balance forecasting, and trend analysis.</p>",
+points:["Absence rate by department, location, or employee group","Seasonal patterns -- when does your organization take the most time off?","Balance liability -- total accrued PTO owed to employees (a financial liability)","Leave of absence trends -- are FMLA or parental leave patterns changing?","Unplanned absence rate -- sudden sick calls vs planned time off","Comparison across countries for global organizations"]},
+
+{title:"Best Practices for T&A Success",
+body:"<p>Organizations that get the most value from Workday T&A follow a set of operational best practices that reduce errors, improve compliance, and save HR time.</p>",
+points:["Train all managers on timecard approval before go-live -- not after","Set up automated reminders for employees who haven't submitted by midweek","Enable exception alerts so managers don't manually hunt for errors","Run a payroll readiness report every Thursday before Friday payroll runs","Audit time calculation rules quarterly -- business rules change over time","Use self-service tools to reduce HR workload: employees handle their own requests","Document all configuration decisions -- future admins will need this context"]}
+]},
+
+{id:5,title:"dormakaba + Workday",color:"#c84b31",lessons:[
+{title:"Meet the dormakaba K7 Terminal Family",
+body:"<p>The dormakaba K7 is the newest generation of physical time recording terminals. The K7 family connects directly to Workday through B-COMM middleware and is trusted by over 1,800 organizations worldwide.</p>",
+table:{h:["Model","Best For","Key Features"],r:[["96 00","Small to mid-size sites","Touchscreen, RFID, PoE powered"],["97 00","Mid-size with more display needs","Larger screen, richer menu options"],["98 00","Enterprise and complex workflows","10.1in screen, biometrics, text-to-speech, door access"]]},
+points:["All K7 terminals run dormakaba Android OS -- updateable remotely","All support RFID badge identification (LEGIC and MIFARE standards)","All support Mobile Access -- employees can clock in with their smartphone","All powered via Power over Ethernet -- no separate power cable required","Offline punch storage: clocks store punches locally when network is unavailable and sync on reconnect"]},
+
+{title:"dormakaba 98 00: Hardware Deep-Dive",
+body:"<p>The 98 00 is the premium K7 model built for large enterprise deployments where employees need an intuitive, information-rich terminal experience.</p>",
+table:{h:["Spec","Value"],r:[["Screen","10.1 inch touchscreen, 1280x800 pixels, scratch-resistant glass"],["Processor","i.MX8M mini quad-core CPU"],["Memory","4 GB RAM, 16 GB eMMC Flash storage"],["OS","dormakaba Android -- updateable over network"],["Audio","1W speaker, microphone, text-to-speech in local language"],["Identification","Smartphone, RFID (LEGIC/MIFARE), optional fingerprint biometrics"],["Power","PoE IEEE 802.3at -- no separate power cable required"],["Environment","Temp: -5 to +45C, Humidity: 5-85%, IP20/IP65 rated, IK06 impact resistance"],["Dimensions","266.5 x 266.2 x 65.6 mm"],["Storage","50,000 master records stored on-device"],["Variants","98 20, 98 40, 98 60 -- different feature combinations"]]},
+info:{t:"Buddy-Punching Prevention",b:"The optional fingerprint biometrics module means only the actual employee can clock in -- preventing one employee from punching in on behalf of another, which is a common payroll fraud issue."}},
+
+{title:"What Data B-COMM Pulls from Workday",
+body:"<p>B-COMM syncs master data from Workday HCM every 15-60 minutes. This data allows the terminal to validate every employee punch in real time without calling Workday on every tap.</p>",
+table:{h:["Data Category","Fields Synced"],r:[["Employee Data","Name, badge number, direct manager, job profiles, positions, accrual balances, time clock attributes"],["Organization Data","Cost centers, custom organizations, supervisory org structure"],["Labor Data","Project numbers, custom worktags for labor transfers"]]},
+points:["No duplicate data entry -- B-COMM reads from Workday, not a separate database","New hires appear on the terminal within one sync cycle after being added to Workday","Terminated employees are deactivated from the terminal automatically after the next sync","Balance data lets the terminal display an employee's PTO balance when they clock in"]},
+
+{title:"What Transaction Data B-COMM Sends Back",
+body:"<p>Every terminal interaction is captured by B-COMM, validated in real time, then sent to Workday where it creates or updates a time block on the employee's timesheet.</p>",
+table:{h:["Transaction Type","Data Sent to Workday"],r:[["Clock In","Employee ID, terminal ID, timestamp, time entry code"],["Clock Out","Employee ID, terminal ID, timestamp"],["Meal Start / End","Meal break type, start and end timestamps"],["Break Start / End","Break type, start and end timestamps"],["Worktag Transfer","New cost center, department, or project code"],["Time Off Request","Absence type and dates -- submitted directly at the terminal"]]},
+points:["Punches appear on the Workday timesheet within 1-5 minutes","B-COMM validates each punch before sending -- invalid badges are rejected at the terminal","Early clock-in can be blocked if the employee punches before their scheduled start","Duplicate punch detection prevents the same event being recorded twice in Workday"]},
+
+{title:"The Full Clock-In Flow: Terminal to Timesheet",
+body:"<p>Here is the complete end-to-end journey of a single clock-in -- from badge tap to Workday timesheet.</p>",
+steps:[{n:1,title:"Employee taps badge or scans fingerprint",body:"The dormakaba 98 00 terminal reads the RFID badge or fingerprint and looks up the badge number in its 50,000-record local database."},{n:2,title:"B-COMM validates the event",body:"The punch is sent to B-COMM. B-COMM checks: Is this a valid badge? Is the employee scheduled? Is this within the allowed clock-in window?"},{n:3,title:"Terminal gives immediate feedback",body:"Valid: green screen with employee name and PTO balance displayed. Invalid: red screen with error message."},{n:4,title:"B-COMM sends to the Workday API",body:"B-COMM calls the Workday Time Clock Events API with the employee ID, timestamp, terminal ID, and event type."},{n:5,title:"Workday creates a time block",body:"The clock-in event opens a time block on the employee's Workday timesheet. The block stays open until a clock-out event arrives."},{n:6,title:"Manager sees it in real time",body:"The manager's dashboard updates immediately showing the employee as clocked in. Any exceptions flag automatically."}]},
+
+{title:"B-COMM for HR, Payroll, and IT",
+body:"<p>B-COMM delivers specific measurable value to three different groups in your organization.</p>",
+table:{h:["Team","Key Benefits"],r:[["HR Managers","Eliminates duplicate timesheet transactions. Reduces manual back-office corrections. Employees get a personalized experience with name and balance at clock-in."],["Payroll Teams","Reduces payroll errors from bad time data. Supports multiple job codes per employee. Enforces meal and break policies automatically. Prevents early clock-in and unauthorized overtime."],["IT Departments","Certified Workday global partner on Workday Marketplace. Available as OnDemand cloud or OnPremise. 24/7 data collection with offline recovery. Trusted by 1,800+ customers worldwide."]]}},
+
+{title:"Cloud vs On-Premise Deployment",
+body:"<p>B-COMM can be deployed in two ways depending on your organization's IT policy and infrastructure preferences.</p>",
+table:{h:["Option","How It Works","Best For"],r:[["OnDemand (Cloud)","dormakaba hosts and manages the B-COMM servers. Terminals connect to the cloud service.","Organizations that prefer SaaS and want minimal IT involvement"],["OnPremise","B-COMM installs on your own Windows Server with SQL database inside your network.","Organizations with data residency requirements or existing on-premise infrastructure"]]},
+info:{t:"Offline Recovery",b:"Both deployment options include offline recovery. If the network or Workday goes down, the dormakaba terminal stores all punches locally in its on-device storage. When connectivity is restored, B-COMM automatically syncs all queued punches to Workday in the correct timestamp order."}}
+]},
+
+{id:6,title:"Setup and Go-Live",color:"#2e7d5e",lessons:[
+{title:"Architecture and Prerequisites",
+body:"<p>Before starting the implementation, confirm the full architecture and ensure all prerequisites are in place. Surprises discovered during build are expensive. Surprises discovered during cutover are catastrophic.</p>",
+steps:[{n:1,title:"Employee punches dormakaba terminal",body:"Employee taps RFID badge, uses smartphone, or scans fingerprint at the 98 00 terminal."},{n:2,title:"B-COMM captures and validates",body:"Validates the punch against Workday HCM master data in real time."},{n:3,title:"Workday Web Services API",body:"B-COMM calls the Time Clock Events API with the validated punch data."},{n:4,title:"Workday timesheet updates",body:"A time block is created or updated on the employee's timesheet within minutes."}],
+info:{t:"Prerequisites",b:"You need: (1) Workday Time Tracking license active, (2) dormakaba terminals physically delivered, (3) B-COMM installed or provisioned, (4) Workday admin access for configuration."}},
+
+{title:"Phase 1 and 2: Workday Prep and Security",
+body:"<p>The first two phases happen entirely inside Workday. Phase 1 enables the time tracking modules. Phase 2 creates the secure account B-COMM uses to communicate with Workday.</p>",
+points:["Enable Time Tracking, Time Entry Templates, Time Clock Events, and Time Calculations in Workday setup","Ensure worker profiles, pay groups, supervisory orgs, cost centers, and worktags are configured before integration begins","Create an Integration System User named ISU_DORMAKABA with a strong password","Enable Do Not Allow UI Sessions -- no human should be able to log in with this account","Create an Integration System Security Group and add the ISU to it","Grant the ISU access to: Worker Data, Time Tracking, Organizations, Time Clock Events, and Time Tracking APIs","Activate Pending Security Policy Changes to make all permissions live"]},
+
+{title:"Phase 3: Creating the ISU",
+body:"<p>The Integration System User is the technical account B-COMM uses to authenticate with Workday. Creating it correctly is one of the most critical steps in the entire implementation.</p>",
+table:{h:["Setting","Value"],r:[["Username","ISU_DORMAKABA"],["Password","Strong password stored in a secure vault -- never plain text"],["Do Not Allow UI Sessions","Enabled -- no human can log in with this account"],["Security Group Type","Integration System Security Group (Unconstrained)"],["Required Domains","Worker Data: Public Worker Reports, Worker Data: Time Tracking, Organizations, Manage Time Clock Events, Time Tracking APIs"]]},
+points:["Always activate Pending Security Policy Changes after granting permissions","Test the ISU permissions before connecting B-COMM"]},
+
+{title:"Phase 4: Workday API Configuration",
+body:"<p>B-COMM integrates with Workday using standard Workday Web Services. Gather connection details and test them before configuring B-COMM.</p>",
+points:["Gather: Workday tenant URL, tenant name, API version, ISU username and password","Most dormakaba deployments use Basic Authentication","Typical endpoint: https://impl.workday.com/ccx/service/TENANT/Human_Resources/v42.0","Test the connection using Postman or SoapUI before configuring B-COMM","Run a Get_Workers API call to confirm employee data returns correctly","Test a Time Clock Event submission to confirm timesheets update","Document all API details in an integration configuration workbook"]},
+
+{title:"Phase 5: Installing and Configuring B-COMM",
+body:"<p>B-COMM is installed on a Windows Server or provisioned as a cloud service. Configuration connects it to Workday and to the dormakaba terminals.</p>",
+steps:[{n:1,title:"Install B-COMM",body:"Deploy on Windows Server with SQL database, or provision the OnDemand cloud instance with dormakaba."},{n:2,title:"Configure Workday connection",body:"Enter the tenant URL, API endpoint, ISU credentials, and API version in the B-COMM admin console."},{n:3,title:"Set sync intervals",body:"Worker master data sync: every 15-60 minutes. Punch sync: real-time or every 1-5 minutes."},{n:4,title:"Configure validation rules",body:"Set early clock-in blocking, invalid badge rejection, and unauthorized overtime alerts."},{n:5,title:"Set up monitoring alerts",body:"Configure email alerts for sync failures and API errors to route to the IT team."},{n:6,title:"Run first manual sync",body:"Trigger a worker sync and confirm all employees appear in B-COMM with correct badge numbers."}]},
+
+{title:"Phase 6: Registering dormakaba Clocks",
+body:"<p>Each physical terminal must be registered in B-COMM and configured before it can accept employee punches.</p>",
+points:["Register each terminal in B-COMM with: Device ID, IP address, time zone, firmware version, and communication protocol (HTTPS or TCP/IP)","Choose employee identification method per terminal: RFID badge, PIN, or fingerprint biometrics","Map Badge Number to Workday Worker ID -- this mapping is critical and must be exact","Most deployments use Employee_ID or Universal_ID as the mapping field","Test each terminal: tap a test badge and confirm the punch appears in B-COMM within 2 minutes","Configure the terminal screen layout with company logo and employee menu options"]},
+
+{title:"Phase 7: Punch Types and Worktag Mapping",
+body:"<p>Every button on the terminal must be mapped to a corresponding Workday Time Clock Event. This is what tells Workday what type of time entry to create.</p>",
+table:{h:["Clock Button","Workday Event"],r:[["IN","Clock In"],["OUT","Clock Out"],["BREAK","Break Start"],["BREAK END","Break End"],["MEAL","Meal Start"],["MEAL END","Meal End"],["TRANSFER","Worktag Transfer (Cost Center / Project)"]]},
+points:["Worktag transfers let employees switch cost centers or projects mid-shift at the terminal","B-COMM sends the selected worktag to Workday as part of the time block","Labor transfer menus can show cost centers, projects, and departments -- configurable per site"]},
+
+{title:"Phase 8: Time Tracking Rules",
+body:"<p>Workday time tracking rules define how raw hours are interpreted. These must be configured before testing begins.</p>",
+points:["Create Time Entry Templates for each worker population: manufacturing hourly, office hourly, salaried exempt","Configure overtime rules: weekly threshold (40 hrs), daily threshold (8 hrs), applicable days","Configure meal penalty rules: if break is missed or shorter than 30 minutes","Set grace periods: allow clock-in up to 5 minutes before scheduled start","Set shift differentials: additional pay for evening, night, or weekend shifts","Configure early clock-in restrictions: block punches more than 15 minutes before scheduled start","Enable meal enforcement: B-COMM alerts if employee has worked 6 hours without a break"]},
+
+{title:"Phase 9: End-to-End Testing",
+body:"<p>Before go-live, every punch scenario must be tested end-to-end. Do not skip any scenario -- each one has caught real issues in previous implementations.</p>",
+table:{h:["Test Scenario","Expected Result"],r:[["Basic clock in","Time block opens on Workday timesheet within 2 minutes"],["Basic clock out","Time block closes with correct duration"],["Meal start and end","Meal break recorded on timesheet"],["Labor transfer","Cost center updates on timesheet"],["Early clock-in attempt","Terminal shows blocked message, no punch sent to Workday"],["Invalid badge","Terminal shows error, no punch sent"],["Offline recovery","Disconnect network, punch 10 times, reconnect -- all 10 sync correctly"],["Duplicate punch","Same punch sent twice -- only one time block created in Workday"]]},
+info:{t:"Offline Recovery Test",b:"Disconnect the terminal's ethernet cable. Have an employee punch in and out 5 times. Reconnect the cable. Within 5 minutes all 5 punches should appear on the Workday timesheet in the correct order. This test is mandatory."}},
+
+{title:"Phase 10: Production Cutover Checklist",
+body:"<p>Every item on this checklist must be confirmed before activating the system for all employees.</p>",
+points:["Move API credentials to production Workday tenant -- not implementation or sandbox","Switch all B-COMM endpoints from implementation to production tenant URL","Repoint all dormakaba terminals to the production B-COMM server","Run a final worker sync in production and confirm all employees are present","Submit a test punch in production and confirm it appears on the timesheet","Confirm all monitoring alerts are active and routing to the IT team","Train all supervisors on timecard approval before day 1 -- not after","Post instructional signage at every terminal location","Send go-live email to all employees with instructions","Monitor hourly for the first 8 hours after go-live"],
+info:{t:"Rollback Plan",b:"Before cutting over, take a snapshot of the B-COMM configuration. Document the decision criteria for rolling back (e.g. if more than 10% of punches fail to sync within 30 minutes, rollback). Have the rollback procedure printed and accessible on go-live day."}},
+
+{title:"Troubleshooting Common Problems",
+body:"<p>Every implementation encounters at least one of these issues. Knowing the fix in advance saves hours of troubleshooting under pressure.</p>",
+table:{h:["Problem","Root Cause","Fix"],r:[["Duplicate punches in Workday","B-COMM retry logic sending the same punch twice","Enable transaction IDs in B-COMM and add deduplication rule"],["Worker Not Found on terminal","Badge number in B-COMM does not match Workday Worker ID","Verify badge number maps to Employee_ID or Universal_ID in Workday"],["Punch arrives but no time block","Time calculation rules incomplete or Time Entry Template not assigned","Check worker has a Time Entry Template assigned and calculation tags are configured"],["Authentication errors (401)","ISU password expired or permissions changed","Verify ISU credentials in B-COMM and check security domain permissions in Workday"],["Terminal punches not syncing","B-COMM queue backed up or network issue","Check B-COMM sync log and verify network routing to Workday API endpoint"]]}}
+]},
+
+{id:7,title:"PM Implementation Guide",color:"#d4a853",lessons:[
+{title:"WBS 1.0 - Project Initiation",wbs:"1.0",phase:"Plan",who:"Project Manager",dates:"Jun 1-6",
+body:"<p>Every successful implementation starts with a solid project charter. This document is the single source of truth for scope, timeline, budget, and governance.</p>",
+roles:[{r:"pm",t:"Create project charter: objectives, scope, budget, governance model"},{r:"pm",t:"Schedule kickoff meeting with exec sponsor, HR, IT, payroll, and dormakaba"},{r:"pm",t:"Define RACI matrix for all workstreams"},{r:"pm",t:"Establish weekly steering committee and daily stand-up cadence"},{r:"pm",t:"Confirm Workday Time Tracking and B-COMM licenses are procured"},{r:"it",t:"Confirm dormakaba 98 00 terminal hardware purchase orders are placed"}]},
+
+{title:"WBS 1.1 - Stakeholder Alignment",wbs:"1.1",phase:"Plan",who:"HRIS Lead",dates:"Jun 7-12",
+body:"<p>Misaligned stakeholders are the most common cause of implementation delays. Stakeholder alignment is an ongoing process, not a one-time meeting.</p>",
+roles:[{r:"pm",t:"Create stakeholder register: HR, payroll, IT, facilities, supervisors, employees, dormakaba vendor"},{r:"pm",t:"Conduct one-on-one alignment meetings with each stakeholder group"},{r:"pm",t:"Document each stakeholder's expectations, concerns, and definition of success"},{r:"pm",t:"Define the change management and employee communication strategy"},{r:"pm",t:"Obtain written sign-off from HR Director and CHRO that project is sanctioned"}]},
+
+{title:"WBS 1.2 - Current State Assessment",wbs:"1.2",phase:"Plan",who:"Integration Lead",dates:"Jun 13-18",
+body:"<p>Before designing the future state, thoroughly document the current state. Surprises discovered during build are expensive. Surprises discovered during cutover are catastrophic.</p>",
+roles:[{r:"wd",t:"Document all current time tracking processes and systems in use today"},{r:"wd",t:"Document existing Workday HCM config: worker profiles, pay groups, org structures, cost centers, worktags"},{r:"it",t:"Identify all terminal locations and document network drops, PoE availability, mounting options"},{r:"it",t:"Assess current badge/ID infrastructure -- can existing badges work with dormakaba RFID?"},{r:"pm",t:"Identify any existing integrations that may be impacted by this project"}]},
+
+{title:"WBS 1.3 - Integration Strategy",wbs:"1.3",phase:"Plan",who:"Infrastructure Team",dates:"Jun 19-24",
+body:"<p>Define the technical approach for connecting dormakaba terminals to Workday before any build work begins.</p>",
+roles:[{r:"it",t:"Decide B-COMM deployment: OnDemand cloud or OnPremise Windows Server"},{r:"it",t:"Document network topology: terminals to B-COMM to Workday API"},{r:"it",t:"Determine static IP addresses or hostname resolution for all terminals"},{r:"it",t:"Define firewall rules for HTTPS traffic from B-COMM to Workday endpoints"},{r:"it",t:"Document failover and offline recovery strategy for network or Workday downtime"},{r:"it",t:"If on-premise: specify host server, Windows Server version, SQL Server version, HTTPS cert requirements"}]},
+
+{title:"WBS 1.4 - Environment Planning",wbs:"1.4",phase:"Plan",who:"Security Team",dates:"Jun 25-30",
+body:"<p>Provision all three Workday environments and establish governance processes before build begins.</p>",
+roles:[{r:"wd",t:"Provision Workday Sandbox tenant for initial configuration"},{r:"wd",t:"Provision Workday Implementation tenant for integration testing"},{r:"wd",t:"Confirm Production tenant is available and access-controlled"},{r:"it",t:"Request dormakaba to provision a B-COMM test environment"},{r:"pm",t:"Establish change control process -- no production changes without approval"},{r:"pm",t:"Define naming conventions for ISU accounts, security groups, and time entry templates"}]},
+
+{title:"WBS 2.0 - Future State Workshops",wbs:"2.0",phase:"Blueprint",who:"Payroll Lead",dates:"Jul 1-7",
+body:"<p>Blueprint workshops bring stakeholders together to design the future state before any configuration begins. Every decision made in a workshop saves 10 hours of rework during build.</p>",
+roles:[{r:"pm",t:"Run workshops with HR, payroll, supervisors, IT -- document all decisions in blueprint"},{r:"wd",t:"Capture: which employees are hourly vs salaried vs exempt by location"},{r:"wd",t:"Capture: all overtime rules -- daily, weekly, by union agreement or state law"},{r:"wd",t:"Capture: all meal and break rules -- duration, penalty triggers, enforcement windows"},{r:"wd",t:"Capture: how labor transfers and cost center allocations work at the terminal"},{r:"pm",t:"Obtain stakeholder sign-off on completed blueprint document"}]},
+
+{title:"WBS 2.1 - Workday Design",wbs:"2.1",phase:"Blueprint",who:"Business Analyst",dates:"Jul 8-14",
+body:"<p>Design the Workday Time Tracking configuration based on workshop outputs. Every design decision must be documented in the Configuration Workbook before build begins.</p>",
+roles:[{r:"wd",t:"Design Time Entry Templates for each worker population (hourly manufacturing, hourly office, salaried)"},{r:"wd",t:"Design time calculation rules: daily OT, weekly OT, meal penalties, shift differentials"},{r:"wd",t:"Design time period structure: weekly, biweekly, or semimonthly pay periods"},{r:"wd",t:"Document supervisory org to manager mappings for timecard approval routing"},{r:"wd",t:"Design absence plan structure and its integration with time tracking"},{r:"wd",t:"Produce a Time Tracking Configuration Workbook documenting every design decision"}]},
+
+{title:"WBS 2.2 - Clock Design",wbs:"2.2",phase:"Blueprint",who:"Vendor Team",dates:"Jul 15-21",
+body:"<p>Design the physical terminal setup for every location before ordering hardware or scheduling installers.</p>",
+roles:[{r:"tc",t:"Document every terminal location with floor plan diagrams and exact mounting position"},{r:"tc",t:"For each location: network drop, PoE switch port, wall material, IP rating needed (IP20 or IP65), traffic volume"},{r:"tc",t:"Design terminal screen layout: company logo, menu options, identification methods (RFID, biometric, PIN)"},{r:"wd",t:"Define badge number format and confirm alignment with Workday Worker ID field"},{r:"tc",t:"Confirm RFID card compatibility with dormakaba multi-RFID reader (LEGIC/MIFARE)"},{r:"pm",t:"Obtain site sign-off from facilities for each terminal installation location"}]},
+
+{title:"WBS 2.3 - B-COMM Integration Design",wbs:"2.3",phase:"Blueprint",who:"PM",dates:"Jul 22-28",
+body:"<p>Document the complete B-COMM data flow and validation rules before any configuration begins.</p>",
+roles:[{r:"it",t:"Document complete B-COMM data flow: terminal punch to B-COMM to Workday API to timesheet"},{r:"it",t:"Define sync schedules: worker master data every 30 min, punch sync real-time every 2 min"},{r:"wd",t:"Define all worktag transfer options at terminal: cost center, project, department codes"},{r:"it",t:"Design B-COMM validation rules: invalid badge rejection, early clock-in prevention, OT alerts"},{r:"pm",t:"Define B-COMM admin console user list and access levels"},{r:"pm",t:"Document rollback plan if B-COMM fails to communicate with Workday"}]},
+
+{title:"WBS 2.4 - Security Design",wbs:"2.4",phase:"Blueprint",who:"HRIS Lead",dates:"Jul 29-Aug 4",
+body:"<p>Design the ISU account and security group structure before any configuration begins in Workday.</p>",
+roles:[{r:"wd",t:"Specify ISU account: username ISU_DORMAKABA, strong password, Do Not Allow UI Sessions enabled"},{r:"wd",t:"List all Workday security domains needed: Worker Data, Time Tracking, Organizations, Time Clock Events, Time Tracking APIs"},{r:"wd",t:"Define Integration System Security Group name and ISU membership"},{r:"wd",t:"Document who must sign off before ISU is activated in production"},{r:"it",t:"Confirm ISU credentials will be stored in a secure vault -- never in plain text"},{r:"pm",t:"Schedule security review meeting with IT security team before build begins"}]},
+
+{title:"WBS 2.5 - Reporting Requirements",wbs:"2.5",phase:"Blueprint",who:"Integration Lead",dates:"Aug 5-11",
+body:"<p>Define every operational report needed by HR, payroll, and IT before the build phase begins.</p>",
+roles:[{r:"wd",t:"Define daily punch exception report: missed punches, early clock-ins, invalid badges"},{r:"wd",t:"Define weekly overtime risk report: employees approaching OT threshold"},{r:"wd",t:"Define payroll readiness report: employees with incomplete or unapproved timecards"},{r:"it",t:"Define B-COMM sync error report: failed API calls, timeout events"},{r:"pm",t:"Document report recipients, delivery frequency, and format (email, dashboard, PDF)"},{r:"wd",t:"Define Global Absence Analytics dashboard layout and KPIs"}]},
+
+{title:"WBS 3.0 - Workday Configuration",wbs:"3.0",phase:"Build",who:"Workday Analyst + IT",dates:"Aug 12-26",
+body:"<p>All Workday configuration is performed in the Sandbox tenant first, then promoted to Implementation for testing. Document every configuration item as you go.</p>",
+roles:[{r:"wd",t:"In Workday Sandbox: go to Maintain Time Tracking Setup and enable Time Tracking"},{r:"wd",t:"Create Time Entry Templates for each worker group as documented in blueprint"},{r:"wd",t:"Configure time calculation rules: weekly OT at 40 hrs, daily OT, meal penalties, shift differentials"},{r:"wd",t:"Set up Time Period Schedules matching payroll calendar dates"},{r:"wd",t:"Configure Time Clock Events: Clock In, Clock Out, Meal Start, Meal End, Break Start, Break End, Worktag Transfer"},{r:"wd",t:"Configure absence plans and accrual policies; validate supervisory org approval chains"},{r:"wd",t:"Document every configuration item in the Configuration Workbook"}]},
+
+{title:"WBS 3.1 - B-COMM Configuration",wbs:"3.1",phase:"Build",who:"IT + dormakaba",dates:"Aug 27-Sep 10",
+body:"<p>Install and configure B-COMM to connect to the Workday Sandbox tenant for initial testing.</p>",
+roles:[{r:"it",t:"Install B-COMM on designated server or provision the cloud instance with dormakaba"},{r:"it",t:"Configure Workday connection: sandbox tenant URL, API endpoint, ISU credentials, API version"},{r:"it",t:"Set worker sync interval to 30 minutes; set punch sync to real-time with 2-min retry max"},{r:"it",t:"Configure all validation rules per integration design document"},{r:"it",t:"Set up B-COMM admin portal accounts for IT and HR administrators"},{r:"it",t:"Configure email alert recipients for sync failures and API errors"},{r:"it",t:"Run manual worker sync and confirm all employees appear in B-COMM correctly"}]},
+
+{title:"WBS 3.2 - Clock Configuration",wbs:"3.2",phase:"Build",who:"dormakaba installer + IT",dates:"Sep 11-25",
+body:"<p>Physically install and configure each dormakaba terminal at the approved locations.</p>",
+roles:[{r:"tc",t:"Unbox and inspect each dormakaba 98 00 terminal before installation"},{r:"tc",t:"Mount terminal to wall using ZAMAK back plate at the approved location"},{r:"tc",t:"Connect ethernet cable to PoE switch port -- confirm switch is IEEE 802.3at compliant"},{r:"tc",t:"Configure terminal IP address, time zone, hostname in dormakaba Android admin"},{r:"it",t:"Register each terminal in B-COMM: enter device IP, device ID, location name"},{r:"tc",t:"Configure screen layout, company logo, and employee menu options on each terminal"},{r:"it",t:"Test each terminal: tap test badge, confirm punch appears in B-COMM within 2 minutes"}]},
+
+{title:"WBS 3.3 - API Integration Setup",wbs:"3.3",phase:"Build",who:"Integration Lead + IT",dates:"Sep 26-Oct 10",
+body:"<p>Test every Workday API endpoint that B-COMM will use. Document all results and confirm zero errors before signing off on the build phase.</p>",
+roles:[{r:"it",t:"Test Get Workers API: confirm all active employees return with correct badge numbers and Worker IDs"},{r:"it",t:"Test Time Clock Event API: submit simulated clock-in, confirm time block created on Workday timesheet"},{r:"it",t:"Test Worktag Transfer punch: confirm cost center updates correctly on the timesheet"},{r:"it",t:"Test absence request from terminal: confirm time off request created in Workday"},{r:"it",t:"Test validation rules: invalid badge should be rejected, early punch should be blocked"},{r:"it",t:"Document all API test results -- confirm zero errors before proceeding to build phase sign-off"}]},
+
+{title:"WBS 3.4 - Reporting Build",wbs:"3.4",phase:"Build",who:"Workday Analyst",dates:"Oct 11-25",
+body:"<p>Build all reports defined in the blueprint. Get business sign-off from HR and Payroll before marking this phase complete.</p>",
+roles:[{r:"wd",t:"Build daily punch exception report in Workday using Time Clock Events data source"},{r:"wd",t:"Build weekly overtime risk report showing employees nearing 40-hr threshold"},{r:"wd",t:"Build payroll readiness report showing missing or unapproved timecards by pay period"},{r:"it",t:"Configure B-COMM sync error report export and schedule it daily"},{r:"wd",t:"Schedule all automated reports and test delivery to defined recipients"},{r:"wd",t:"Obtain business sign-off from HR and Payroll that each report meets requirements"}]},
+
+{title:"WBS 3.5 - Monitoring Setup",wbs:"3.5",phase:"Build",who:"IT Team",dates:"Oct 26-Nov 9",
+body:"<p>Configure monitoring and alerting before IT testing begins. You need these alerts in place before go-live.</p>",
+roles:[{r:"it",t:"Configure B-COMM email alerts for: failed worker syncs, punch delivery failures, API auth errors"},{r:"it",t:"Set up monitoring dashboard showing B-COMM service status, API response times, punch queue depth"},{r:"wd",t:"Configure Workday audit reports to flag unexpected ISU API activity"},{r:"pm",t:"Document escalation path: Level 1 help desk to Level 2 IT to Level 3 dormakaba/Workday support"},{r:"it",t:"Test all alerts by simulating a B-COMM connectivity failure -- confirm alert fires within 5 min"}]},
+
+{title:"WBS 4.0 - Worker Sync Testing",wbs:"4.0",phase:"IT Testing",who:"HRIS Lead",dates:"Nov 10-15",
+body:"<p>Validate that worker master data syncs correctly between Workday and B-COMM in all scenarios including new hires, updates, and terminations.</p>",
+roles:[{r:"wd",t:"Create test employee in Workday sandbox with known badge number"},{r:"it",t:"Trigger B-COMM worker sync, confirm test employee appears within sync interval"},{r:"wd",t:"Update test employee name and department in Workday; confirm B-COMM reflects update after next sync"},{r:"wd",t:"Terminate test employee in Workday; confirm they deactivate in B-COMM"},{r:"wd",t:"Test edge cases: employee with multiple jobs, multiple cost centers, employee on leave"},{r:"pm",t:"Document all results in test evidence log; get sign-off from HRIS Lead"}]},
+
+{title:"WBS 4.1 - Punch Validation Testing",wbs:"4.1",phase:"IT Testing",who:"Integration Lead",dates:"Nov 16-21",
+body:"<p>Run all punch scenarios end-to-end. Every scenario must pass before proceeding to error handling testing.</p>",
+roles:[{r:"it",t:"Test scenario 1: Basic clock-in -- confirm time block on Workday timesheet within 2 min"},{r:"it",t:"Test scenario 2: Clock-out -- confirm time block closes correctly"},{r:"it",t:"Test scenario 3: Meal start and end -- confirm meal break records correctly"},{r:"it",t:"Test scenario 4: Break start and end -- confirm break records correctly"},{r:"it",t:"Test scenario 5: Worktag transfer -- confirm cost center updates on timesheet"},{r:"it",t:"Test scenario 6: Early clock-in attempt -- confirm blocked with error message on screen"},{r:"it",t:"Test scenario 7: Invalid badge -- confirm rejected with error message on screen"},{r:"it",t:"Test scenario 8: Offline recovery -- disconnect network, punch 10 times, reconnect, confirm all 10 sync"}]},
+
+{title:"WBS 4.2 - Error Handling Testing",wbs:"4.2",phase:"IT Testing",who:"Infrastructure Team",dates:"Nov 22-27",
+body:"<p>Validate that the system handles outages and error conditions gracefully without losing any punch data.</p>",
+roles:[{r:"it",t:"Test Workday downtime: take API offline, generate 20 punches, bring online, confirm all 20 sync within 10 min"},{r:"it",t:"Test B-COMM restart: stop service, generate 10 punches, restart, confirm punches sync"},{r:"it",t:"Test terminal network disconnect: unplug ethernet, generate 5 punches, reconnect, confirm sync"},{r:"it",t:"Test duplicate punch prevention: submit same punch twice in 30 sec, confirm only 1 time block created"},{r:"pm",t:"Document all results; confirm every scenario passes before proceeding to security testing"}]},
+
+{title:"WBS 4.3 - Security Testing",wbs:"4.3",phase:"IT Testing",who:"Security Team",dates:"Nov 28-Dec 3",
+body:"<p>Validate that all security controls are working correctly. The ISU should only be able to do exactly what it needs to do -- nothing more.</p>",
+roles:[{r:"wd",t:"Attempt browser login using ISU credentials -- confirm Do Not Allow UI Sessions blocks it"},{r:"wd",t:"Confirm ISU can only access domains granted in the security group -- test each domain boundary"},{r:"it",t:"Submit API call without ISU credentials -- confirm 401 Unauthorized response"},{r:"wd",t:"Review Workday audit log -- confirm all ISU API calls are logged with timestamps and IP addresses"},{r:"wd",t:"Confirm no employee can access another employee's timesheet data via the API"}]},
+
+{title:"WBS 4.4 - Performance Testing",wbs:"4.4",phase:"IT Testing",who:"IT Team",dates:"Dec 4-9",
+body:"<p>Validate that the system meets performance SLAs under peak load conditions before UAT begins.</p>",
+roles:[{r:"it",t:"Simulate peak load: 50 simultaneous punch submissions to B-COMM, confirm all 50 appear in Workday within 5 min"},{r:"it",t:"Run full worker sync with all active employees -- measure duration, confirm completes within sync interval"},{r:"it",t:"Test terminal response time under load: 10 employees punching within 60 sec, confirm each response under 3 sec"},{r:"pm",t:"Document all performance metrics; confirm they meet defined SLAs before UAT sign-off"}]},
+
+{title:"WBS 5.0 - Business Process Validation",wbs:"5.0",phase:"Business UAT",who:"Business Analyst",dates:"Dec 10-16",
+body:"<p>Business users validate that the system meets their requirements. Recruit pilot employees from each worker population for a complete end-to-end test.</p>",
+roles:[{r:"pm",t:"Recruit 10-20 pilot employees representing all worker populations (hourly, salaried, multi-job)"},{r:"pm",t:"Run pilot employees through a complete simulated work week using the dormakaba terminals"},{r:"wd",t:"Have each supervisor approve pilot timecards in Workday -- confirm approval routing is correct"},{r:"wd",t:"Test all exception scenarios: missed punch correction, manager entry on behalf, time off request at terminal"},{r:"pm",t:"Document all issues found; resolve with Workday analyst before proceeding to payroll validation"}]},
+
+{title:"WBS 5.1 - Payroll Validation",wbs:"5.1",phase:"Business UAT",who:"Payroll Lead",dates:"Dec 17-23",
+body:"<p>Run a parallel payroll calculation using pilot time data and compare outputs against expected values. This is the payroll team's primary sign-off gate.</p>",
+roles:[{r:"wd",t:"Run parallel payroll calculation using pilot employee time data"},{r:"wd",t:"Compare Workday time outputs (regular hrs, OT hrs, meal penalties) against expected values by pay rule"},{r:"wd",t:"Confirm weekly OT triggers correctly at 40-hour threshold"},{r:"wd",t:"Confirm meal penalties trigger correctly when break is missed or too short"},{r:"wd",t:"Confirm shift differentials apply to correct shifts per shift schedule"},{r:"pm",t:"Document any discrepancies; resolve with Workday analyst before UAT sign-off"}]},
+
+{title:"WBS 5.2 - End User Testing",wbs:"5.2",phase:"Business UAT",who:"PM",dates:"Dec 24-30",
+body:"<p>Deploy terminals to a broad group of employees for a real-world simulation. Collect feedback and address all issues before go-live.</p>",
+roles:[{r:"pm",t:"Deploy terminals to 30-50 employees for a 5-day real-world simulation"},{r:"pm",t:"Survey employees on ease of use, terminal location, and any issues encountered"},{r:"pm",t:"Survey supervisors on the timecard approval experience in Workday"},{r:"pm",t:"Confirm terminal text-to-speech is working in all required languages"},{r:"pm",t:"Compile feedback, prioritize issues, and create resolution plan for all items before go-live"}]},
+
+{title:"WBS 5.3 - UAT Sign-Off",wbs:"5.3",phase:"Business UAT",who:"HRIS Lead",dates:"Dec 31-Jan 6",
+body:"<p>Formal sign-off is required from HR, Payroll, and IT before go-live approval can be granted. No open critical issues are permitted at this stage.</p>",
+roles:[{r:"pm",t:"Compile UAT results report: all test scenarios, pass rates, issues found, issues resolved"},{r:"pm",t:"Obtain written sign-off from HR Director, Payroll Director, and IT Director"},{r:"pm",t:"Document any open items with resolution plan and target date"},{r:"pm",t:"Present UAT results to steering committee and obtain approval to proceed to implementation phase"}]},
+
+{title:"WBS 6.0 - Production Readiness Review",wbs:"6.0",phase:"Implementation",who:"Integration Lead",dates:"Jan 7-9",
+body:"<p>The go-live readiness review is a formal checkpoint. Every item on the readiness checklist must be green before proceeding to cutover.</p>",
+roles:[{r:"pm",t:"Complete go-live readiness checklist -- all items must be green before proceeding"},{r:"wd",t:"Confirm all Workday production configurations are complete and tested"},{r:"it",t:"Confirm B-COMM is installed and pointing to production Workday tenant"},{r:"tc",t:"Confirm all terminals are physically installed, connected, and passing punch tests"},{r:"wd",t:"Confirm all employee badge numbers are correctly mapped in production B-COMM worker master"},{r:"pm",t:"Present readiness report to steering committee; obtain go-live approval"}]},
+
+{title:"WBS 6.1 - End User Training",wbs:"6.1",phase:"Implementation",who:"Infrastructure Team",dates:"Jan 10-12",
+body:"<p>All employees and supervisors must be trained before go-live. Do not assume people will figure it out on their own.</p>",
+roles:[{r:"pm",t:"Deliver employee training sessions at each site: how to clock in/out, select cost center, request time off at terminal"},{r:"wd",t:"Deliver supervisor training: timecard approval in Workday, correcting missed punches, running exception reports"},{r:"wd",t:"Deliver payroll team training: new data flow, handling exceptions, first payroll cycle procedures"},{r:"pm",t:"Distribute employee quick reference card and supervisor training guide"},{r:"tc",t:"Post instructional signage near each terminal at all sites"}]},
+
+{title:"WBS 6.2 - Support Preparation",wbs:"6.2",phase:"Implementation",who:"Security Team + IT",dates:"Jan 13-15",
+body:"<p>A documented support model must be in place before go-live. Every person who will handle support tickets must know their role and the escalation path.</p>",
+roles:[{r:"pm",t:"Document Level 1 runbook: top 10 employee issues (lost badge, missed punch, wrong cost center, terminal offline)"},{r:"it",t:"Document Level 2 runbook: B-COMM sync failures, API errors, terminal hardware issues"},{r:"pm",t:"Document Level 3 escalation: dormakaba support for hardware, Workday support for platform issues"},{r:"it",t:"Set up T&A category in help desk ticketing system"},{r:"pm",t:"Brief help desk team on the new system; confirm all support staff know the escalation path"}]},
+
+{title:"WBS 6.3 - Final Data Validation",wbs:"6.3",phase:"Implementation",who:"Payroll Lead",dates:"Jan 16-18",
+body:"<p>Run a final data quality check in the production environment before cutover. This is your last chance to catch data issues before employees start clocking in for real.</p>",
+roles:[{r:"wd",t:"Run data quality check: every active employee has valid Worker ID and correct badge number in production B-COMM"},{r:"wd",t:"Confirm all pay groups have correct payroll calendar configured in Workday production"},{r:"wd",t:"Confirm all time calculation rules are active and correctly configured in production"},{r:"it",t:"Run test worker sync from production B-COMM to production Workday -- confirm all employees sync"},{r:"it",t:"Confirm production API endpoints are correctly configured and ISU is active with correct permissions"}]},
+
+{title:"WBS 7.0 - Configuration Freeze",wbs:"7.0",phase:"Cutover",who:"Business Analyst + IT",dates:"Jan 19",
+body:"<p>Implement a configuration freeze from this point until 30 days after go-live. No changes to Workday, B-COMM, or terminal firmware without formal change control approval.</p>",
+roles:[{r:"pm",t:"Implement configuration freeze -- communicate freeze policy in writing to all team members"},{r:"pm",t:"No changes to Workday Time Tracking, B-COMM, or terminal firmware without change control board approval"},{r:"it",t:"Confirm last implementation tenant backup has been taken"},{r:"it",t:"Confirm production environment snapshot is available for rollback if needed"}]},
+
+{title:"WBS 7.1 - Final Data Migration",wbs:"7.1",phase:"Cutover",who:"Vendor Team",dates:"Jan 20",
+body:"<p>Migrate any legacy data needed in the production environment and run a final worker sync to capture all recent HR changes.</p>",
+roles:[{r:"wd",t:"Migrate legacy accrual balances and open time off requests to Workday production"},{r:"it",t:"Run final delta worker sync from Workday HR to B-COMM production to capture recent hires and terminations"},{r:"wd",t:"Confirm no test data remains in the production environment"},{r:"pm",t:"Obtain data migration sign-off from payroll team before cutover"}]},
+
+{title:"WBS 7.2 - Production Validation",wbs:"7.2",phase:"Cutover",who:"PM + Integration Lead",dates:"Jan 21",
+body:"<p>Run the complete production validation checklist. Every item must pass before Go-Live Day is authorized.</p>",
+roles:[{r:"pm",t:"Run full production validation checklist -- all items must pass"},{r:"it",t:"Submit test punch from one terminal to production B-COMM -- confirm it appears on Workday timesheet within 2 min"},{r:"it",t:"Run worker sync and confirm all employees present in B-COMM with correct badge numbers"},{r:"it",t:"Confirm all monitoring alerts are active and routing to correct recipients"},{r:"pm",t:"Confirm rollback plan is documented and team knows the decision criteria for rollback"}]},
+
+{title:"WBS 7.3 - Activate Integrations (Go-Live Day)",wbs:"7.3",phase:"Cutover",who:"HRIS Lead",dates:"Jan 22",
+body:"<p>This is Go-Live Day. Enable production B-COMM sync at the agreed cutover time -- typically midnight or start of business. All hands on deck.</p>",
+roles:[{r:"it",t:"Enable production B-COMM sync to production Workday at agreed cutover time (midnight or start of business)"},{r:"it",t:"Remove all test or implementation tenant pointers from B-COMM configuration"},{r:"it",t:"Confirm first production worker sync completes successfully"},{r:"tc",t:"Enable all dormakaba terminals to accept live employee punches"},{r:"pm",t:"Communicate to support team that production is live -- all hands on deck"}]},
+
+{title:"WBS 7.4 - Smoke Testing",wbs:"7.4",phase:"Cutover",who:"Integration Lead",dates:"Jan 23",
+body:"<p>Within the first 2 hours of go-live, designated testers at each terminal location perform a real clock-in and clock-out to confirm the system is working end-to-end in production.</p>",
+roles:[{r:"pm",t:"Within 2 hours of go-live: designated testers at each terminal location perform real clock-in and clock-out"},{r:"it",t:"Confirm each smoke test punch appears on Workday timesheet within 5 minutes"},{r:"it",t:"Run B-COMM sync error report -- confirm zero errors in first 2 hours"},{r:"wd",t:"Check Workday audit log -- confirm ISU API calls are being logged"},{r:"pm",t:"If any terminal shows no punches arriving: escalate immediately using Level 2 runbook"}]},
+
+{title:"WBS 7.5 - Go-Live Communications",wbs:"7.5",phase:"Cutover",who:"PM + HR",dates:"Jan 24",
+body:"<p>Send official go-live communications to all employees, supervisors, and the steering committee.</p>",
+roles:[{r:"pm",t:"Send go-live announcement to all employees via email -- new time clocks are now live"},{r:"pm",t:"Post signage at every terminal reminding employees of the new process"},{r:"wd",t:"Brief all supervisors that timecard approval in Workday starts this pay period"},{r:"pm",t:"Send go-live summary report to steering committee confirming successful launch"}]},
+
+{title:"WBS 8.0 - Intensive Monitoring",wbs:"8.0",phase:"Post Go-Live",who:"IT + Integration Lead",dates:"Jan 25-31",
+body:"<p>For the first 7 days after go-live, monitor the system every 2 hours during business hours. Hold a daily stand-up with HR, IT, and Payroll.</p>",
+roles:[{r:"it",t:"For first 7 days: monitor B-COMM sync logs every 2 hours during business hours"},{r:"wd",t:"Run punch exception report daily and review with HR -- address any patterns immediately"},{r:"pm",t:"Track help desk ticket volume and categorize all T&A-related issues"},{r:"pm",t:"Hold daily stand-up with IT, HR, and payroll to review production issues"},{r:"wd",t:"Confirm first payroll cycle using the new system completes accurately with zero calculation errors"}]},
+
+{title:"WBS 8.1 - Optimization",wbs:"8.1",phase:"Post Go-Live",who:"Payroll Lead + IT",dates:"Feb 1-7",
+body:"<p>Based on the first week's production data, tune the system configuration to improve performance and accuracy.</p>",
+roles:[{r:"it",t:"Tune B-COMM sync intervals, validation rules, and alert thresholds based on first week's data"},{r:"wd",t:"If any payroll calculation errors found in first cycle: correct time calculation rules in Workday"},{r:"it",t:"If any terminal connectivity issues found: resolve network infrastructure with IT"},{r:"pm",t:"Review performance metrics against defined SLAs; document and action any gaps"}]},
+
+{title:"WBS 8.2 - Knowledge Transition",wbs:"8.2",phase:"Post Go-Live",who:"Business Analyst",dates:"Feb 8-14",
+body:"<p>Transfer all system knowledge to the internal team. The organization must be able to run this system independently without vendor support after closure.</p>",
+roles:[{r:"pm",t:"Deliver final knowledge transfer session: B-COMM admin, Workday Time Tracking maintenance, terminal management"},{r:"pm",t:"Hand over Configuration Workbook, Support Runbook, Integration Design Document, and Test Results Archive"},{r:"pm",t:"Confirm internal Workday analyst and IT team can independently manage the system without vendor support"},{r:"pm",t:"Confirm dormakaba support contract is active for hardware issues"}]},
+
+{title:"WBS 8.3 - Project Closure",wbs:"8.3",phase:"Post Go-Live",who:"PM + Vendor Team",dates:"Feb 15-21",
+body:"<p>Formal project closure is required to release resources, close purchase orders, and capture lessons learned for future implementations.</p>",
+roles:[{r:"pm",t:"Conduct lessons learned session with all workstream leads -- what went well, what was hard, what we'd do differently"},{r:"pm",t:"Compile final project report: scope delivered, budget variance, schedule performance, quality metrics"},{r:"pm",t:"Obtain formal project closure sign-off from executive sponsor"},{r:"pm",t:"Archive all project documentation in the designated system of record"},{r:"pm",t:"Release all project resources; confirm all vendor invoices and purchase orders are closed"}]}
+]}
+];
+
+// ============================================================
+// STATE
+// ============================================================
+var S={view:"welcome",mi:0,li:0,done:{}};
+
+function totL(){return M.reduce(function(a,m){return a+m.lessons.length;},0);}
+function doneL(){return Object.keys(S.done).length;}
+function gNum(mi,li){var n=0;for(var i=0;i<mi;i++)n+=M[i].lessons.length;return n+li+1;}
+
+// ============================================================
+// SIDEBAR
+// ============================================================
+function buildSB(){
+  var sb=document.getElementById("sb");
+  sb.innerHTML="";
+  M.forEach(function(mod,mi){
+    var dc=mod.lessons.filter(function(_,li){return S.done[mi+"-"+li];}).length;
+    var isOpen=S.view==="lesson"&&S.mi===mi;
+    var isAct=isOpen;
+
+    var g=document.createElement("div");g.className="mod-group";
+
+    var h=document.createElement("div");
+    h.className="mod-hdr"+(isAct?" active":"")+(isOpen?" open":"");
+    h.innerHTML='<div class="mod-dot" style="background:'+mod.color+'"></div>'+
+      '<div class="mod-ttl">'+mod.title+'</div>'+
+      '<div class="mod-cnt">'+dc+"/"+mod.lessons.length+"</div>"+
+      '<div class="mod-arr">&#9656;</div>';
+
+    var l=document.createElement("div");
+    l.className="lessons"+(isOpen?" open":"");
+
+    mod.lessons.forEach(function(les,li){
+      var key=mi+"-"+li;
+      var isCur=S.view==="lesson"&&S.mi===mi&&S.li===li;
+      var isDone=S.done[key];
+      var it=document.createElement("div");
+      it.className="les-item"+(isCur?" active":"");
+      it.innerHTML='<div class="les-chk'+(isDone?" done":"")+'">'+( isDone?"&#10003;":"")+'</div>'+
+        '<div class="les-num">'+gNum(mi,li)+'</div>'+
+        '<div class="les-ttl">'+les.title+'</div>';
+      (function(a,b){it.onclick=function(){go(a,b);};})(mi,li);
+      l.appendChild(it);
+    });
+
+    h.onclick=function(){l.classList.toggle("open");h.classList.toggle("open");};
+    g.appendChild(h);g.appendChild(l);sb.appendChild(g);
+  });
+}
+
+// ============================================================
+// RENDER LESSON
+// ============================================================
+function renderLesson(les,mi,li){
+  var mod=M[mi];
+  var tot=totL();
+  var gn=gNum(mi,li);
+  var isDone=S.done[mi+"-"+li];
+  var prevOK=!(mi===0&&li===0);
+  var nextOK=!(mi===M.length-1&&li===mod.lessons.length-1);
+
+  var h='<div class="lesson">';
+
+  // Eyebrow
+  h+='<div class="eyebrow">'+
+    '<span class="mod-badge" style="background:'+mod.color+'">'+mod.title+'</span>'+
+    '<span class="les-num-badge">Lesson '+gn+' of '+tot+'</span>'+
+    '</div>';
+
+  // WBS metadata if PM lesson
+  if(les.wbs){
+    h+='<div class="wbs-meta">'+
+      '<span class="wbs-chip phase">Phase: '+les.phase+'</span>'+
+      '<span class="wbs-chip">WBS: '+les.wbs+'</span>'+
+      '<span class="wbs-chip">Owner: '+les.who+'</span>'+
+      '<span class="wbs-chip">Dates: '+les.dates+'</span>'+
+      '</div>';
+  }
+
+  h+='<h1 class="les-heading">'+les.title+'</h1>';
+  h+='<div class="divider" style="background:'+mod.color+'"></div>';
+
+  if(les.body) h+='<div class="body-text">'+les.body+'</div>';
+
+  if(les.points){
+    h+='<div class="key-pts"><div class="key-pts-ttl" style="color:'+mod.color+'">Key Points</div>';
+    les.points.forEach(function(p){
+      h+='<div class="key-pt"><div class="kp-dot" style="background:'+mod.color+'"></div><div>'+p+'</div></div>';
+    });
+    h+='</div>';
+  }
+
+  if(les.info){
+    h+='<div class="info-box"><div class="info-ttl">'+les.info.t+'</div>'+les.info.b+'</div>';
+  }
+
+  if(les.table){
+    h+='<table class="dtable"><thead><tr>';
+    les.table.h.forEach(function(col){h+='<th>'+col+'</th>';});
+    h+='</tr></thead><tbody>';
+    les.table.r.forEach(function(row){
+      h+='<tr>';
+      row.forEach(function(cell){h+='<td>'+cell+'</td>';});
+      h+='</tr>';
+    });
+    h+='</tbody></table>';
+  }
+
+  if(les.steps){
+    h+='<div class="steps">';
+    les.steps.forEach(function(s){
+      h+='<div class="step">'+
+        '<div class="step-n" style="background:'+mod.color+'">'+s.n+'</div>'+
+        '<div class="step-body"><div class="step-title">'+s.title+'</div>'+s.body+'</div>'+
+        '</div>';
+    });
+    h+='</div>';
+  }
+
+  if(les.roles){
+    h+='<div class="role-actions">';
+    les.roles.forEach(function(ra){
+      h+='<div class="ra">'+
+        '<span class="ra-role ra-'+ra.r+'">'+ROLES[ra.r]+'</span>'+
+        '<span class="ra-text">'+ra.t+'</span>'+
+        '</div>';
+    });
+    h+='</div>';
+  }
+
+  // Nav
+  h+='<div class="nav-footer">'+
+    '<button class="nav-btn" onclick="prev()" '+(prevOK?'':'disabled')+'>&#8592; Previous</button>'+
+    '<button class="done-btn'+(isDone?' done':'')+'" onclick="toggleDone('+mi+','+li+')" id="db">'+
+      (isDone?'&#10003; Completed':'Mark as Complete')+
+    '</button>'+
+    '<button class="nav-btn primary" onclick="nxt()" '+(nextOK?'':'disabled')+'>Next &#8594;</button>'+
+    '</div>';
+
+  h+='</div>';
+  return h;
+}
+
+// ============================================================
+// WELCOME
+// ============================================================
+function renderWelcome(){
+  var h='<div class="welcome">'+
+    '<div class="ver">v2.0 &nbsp;&middot;&nbsp; 2026-05-09</div>'+
+    '<h1>Workday<br><span>T&amp;A</span> Course</h1>'+
+    '<p class="w-sub">Complete guide to Workday Time &amp; Attendance, dormakaba terminal integration, B-COMM middleware, and full project management implementation. '+totL()+' lessons across '+M.length+' modules.</p>'+
+    '<div class="mod-grid">';
+  M.forEach(function(mod,mi){
+    h+='<div class="mc" onclick="go('+mi+',0)">'+
+      '<div class="mc-top"><div class="mc-dot" style="background:'+mod.color+'"></div>'+
+      '<div class="mc-ttl">'+mod.title+'</div></div>'+
+      '<div class="mc-cnt">'+mod.lessons.length+' lessons</div>'+
+      '</div>';
+  });
+  h+='</div><button class="start-btn" onclick="go(0,0)">Start Course &#8594;</button></div>';
+  return h;
+}
+
+// ============================================================
+// NAVIGATION + RENDER
+// ============================================================
+function go(mi,li){S.view="lesson";S.mi=mi;S.li=li;render();document.getElementById("main").scrollTop=0;}
+function nxt(){var mod=M[S.mi];if(S.li<mod.lessons.length-1){S.li++;}else if(S.mi<M.length-1){S.mi++;S.li=0;}render();document.getElementById("main").scrollTop=0;}
+function prev(){if(S.li>0){S.li--;}else if(S.mi>0){S.mi--;S.li=M[S.mi].lessons.length-1;}render();document.getElementById("main").scrollTop=0;}
+function toggleDone(mi,li){var k=mi+"-"+li;if(S.done[k])delete S.done[k];else S.done[k]=true;render();}
+
+function render(){
+  var done=doneL();var tot=totL();
+  document.getElementById("pf").style.width=Math.round(done/tot*100)+"%";
+  document.getElementById("pl").textContent=done+" / "+tot+" lessons";
+  buildSB();
+  var main=document.getElementById("main");
+  if(S.view==="welcome"){main.innerHTML=renderWelcome();}
+  else{var les=M[S.mi].lessons[S.li];main.innerHTML=renderLesson(les,S.mi,S.li);}
+}
+
+render();
+</script>
+</body>
+</html>
